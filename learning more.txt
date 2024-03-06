@@ -1,0 +1,95 @@
+WARNING: The script normalizer is installed in '/home/cashaad_lawrence/.local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+  WARNING: The script wsdump is installed in '/home/cashaad_lawrence/.local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-locat
+
+
+
+
+ File "/home/cashaad_lawrence/pythontest/testScript.py", line 92, in <module>
+    latest_posts.to_sql('posts_Bitcoin', con=engine, if_exists='append', index = False)
+  File "/usr/lib/python3/dist-packages/pandas/core/generic.py", line 2605, in to_sql
+    sql.to_sql(
+  File "/usr/lib/python3/dist-packages/pandas/io/sql.py", line 580, in to_sql
+    pandas_sql = pandasSQL_builder(con, schema=schema)
+  File "/usr/lib/python3/dist-packages/pandas/io/sql.py", line 656, in pandasSQL_builder
+    return SQLDatabase(con, schema=schema, meta=meta)
+  File "/usr/lib/python3/dist-packages/pandas/io/sql.py", line 1147, in __init__
+    meta = MetaData(self.connectable, schema=schema)
+TypeError: __init__() got multiple values for argument 'schema'
+
+
+/home/cashaad_lawrence/.local/lib/python3.9/site-packages/pandas/core/computation/expressions.py:20: UserWarni>
+  from pandas.core.computation.check import NUMEXPR_INSTALLED
+
+
+
+2023-04-03T13:38:55.668343Z 171762 [Note] [MY-010914] [Server] Aborted connection 171762 to db: 'test' user: 'root' host: '35.223.197.163' (Got an error reading communication packets).
+
+
+
+CREATE TABLE `comments_Bitcoin` (
+  `post_id` text,
+  `comment_id` text,
+  `comment_parent_id` text,
+  `author` text,
+  `raw_comment` text,
+  `karma` bigint DEFAULT NULL,
+  `awards` bigint DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+
+CREATE TABLE `posts_Bitcoin` (
+  `subreddit` text,
+  `post_id` text,
+  `created` datetime DEFAULT NULL,
+  `raw_title` text,
+  `author` text,
+  `score` bigint DEFAULT NULL,
+  `awards` bigint DEFAULT NULL,
+  `permalink` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+
+crontab
+https://linuxhint.com/execute-crontab-every-5-minutes/
+https://gavinwiener.medium.com/how-to-schedule-a-python-script-cron-job-dea6cbf69f4e
+
+
+
+https://cloud.google.com/python/docs/setup
+
+1. Go to Google Cloud Console
+2. Create an instance
+3. Go to Cloud Shell (SSH)
+4. Run sudo -i command for accessing the root directory
+5. Run apt update command.
+6. To install Apache 2, run apt-get install apache2 
+7.To open the configuration file run nano /etc/apache2/apache2.conf
+8. To execute .py files run Options +ExecCGI
+  	                                AddHandler cgi-script .py
+9. Run service apache2 restart
+10. To enable cgid module for python script, run a2enmod cgi command
+11. Run service apache2 restart
+12. Run apt install python python-dev python3 python3-dev  
+13. To install pip, run  wget https://bootstrap.pypa.io/get-pip.py  
+14. To know pip version run pip --version
+15. To install virtualenv, run pip install --upgrade virtualenv
+16. To create virtualenv in your project run cd /var/www/html/
+17. Run virtualenv --python python3 env
+18. To activate virtualenv run source env/bin/activate
+19. Run nano hello.py
+                chmod 777 hello.py
+20. To install dos2unix, run apt-get install dos2unix
+21. To run any python script uploaded from Windows in Linux run dos2unix “filename”.py
+
+
+
+
+
+
+
+
+
+Successfully installed pip-23.0.1
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
