@@ -1,0 +1,114 @@
+import os
+import praw as p
+import pandas as pd
+from datetime import datetime, timedelta
+import sys
+import pymysql
+from sqlalchemy import create_engine, Column, Table
+from sqlalchemy.types import Integer, Text, String, DateTime
+
+engine = create_engine('mysql+pymysql://root:nopassword@34.83.104.139/test')
+
+conn = engine.connect()
+
+r = p.Reddit(
+        client_id='q5pBP7wJOg4ce_P9sOkyXA',
+        client_secret='oD61dQ0l20WEPRqP35GqshO8AdZz0g',
+        redirect_uri='http://localhost:8000',
+        user_agent='AdaAnalyticsBot',
+        read_only=True
+    )
+
+def getHotPostsAsDF(r, subredditName, postLimit=500):
+  df = pd.DataFrame()   
+  subreddit = r.subreddit(subredditName) 
+  for submission in subreddit.('all')(limit=postLimit):
+    df = df.append({'subreddit': subredditName,
+                  'post_id': submission.id,
+                  'created': datetime.utcfromtimestamp(submission.created_utc).strftime('%Y-%m-%d %H:%M:%S'),
+                  'raw_title': submission.title,
+                  'author': submission.author,
+                  'score': round(submission.score),
+		  'awards': round(submission.total_awards_received),
+                  'comments_num': round(submission.num_comments),
+                  'ups_vote': round(submission.ups),
+                  'down_vote': round (submission.downvote),
+                  'Percentage': submission.upvote_ratio},
+                  ignore_index = True)
+
+    df['created'] = pd.to_datetime(df['created'], format='%Y-%m-%d %H:%M:%S')  
+  return(df)
+
+def getAllCommentsAsDF(r, submissionId):
+  df = pd.DataFrame()
+  res = getAllComments(r, submissionId)
+  for item in res:
+      if type(item) == p.models.reddit.comment.Comment:
+          parent_id_clean = item.parent_id.replace("t1_","").replace("t3_","")
+          if parent_id_clean==submissionId:
+            parent_id_clean = ''
+          df = df.append({'post_id':submissionId,
+                          'comment_id': item.id,
+                          'comment_parent_id': parent_id_clean,
+                          'author': item.author,
+                          'raw_comment': item.body,
+                          'score': round(item.score),
+                          'awards': round(item.total_awards_received),
+                          'created': datetime.utcfromtimestamp(item.created_utc).strftime('%Y-%m-%d %H:%M:%S')
+                     },  
+                  ignore_index = True)
+  return(df)   
+
+
+def getAllComments(r, submissionId, verbose=True):
+  submission = r.submission(submissionId)
+  comments = submission.comments
+  commentsList = []
+  for comment in comments:
+    getSubComments(comment, commentsList, verbose=verbose)
+  return commentsList
+
+
+def getSubComments(comment, allComments, verbose=True):
+  allComments.append(comment)
+  if not hasattr(comment, "replies"):
+    replies = comment.comments()
+    if verbose: print("fetching (" + str(len(allComments)) + " comments fetched total)")
+  else:
+    replies = comment.replies
+  for child in replies:
+    getSubComments(child, allComments, verbose=verbose)
+
+
+latest_posts = getHotPostsAsDF(r, "Bitcoin", 500)
+
+
+latest_posts.to_sql('Posts', con=engine, if_exists='append', index = False)
+
+
+def getAllComments(r, submissionId, verbose=True):
+  submission = r.submission(submissionId)
+  comments = submission.comments
+  commentsList = []
+  for comment in comments:
+    getSubComments(comment, commentsList, verbose=verbose)
+  return commentsList
+
+
+def getSubComments(comment, allComments, verbose=True):
+  allComments.append(comment)
+  if not hasattr(comment, "replies"):
+    replies = comment.comments()
+    if verbose: print("fetching (" + str(len(allComments)) + " comments fetched total)")
+  else:
+    replies = comment.replies
+  for child in replies:
+    getSubComments(child, allComments, verbose=verbose)
+
+latest_posts = getHotPostsAsDF(r, "Bitcoin", 500)
+
+latest_posts.to_sql('Posts', con=engine, if_exists='append', index = False)
+
+
+engine.close()
+
